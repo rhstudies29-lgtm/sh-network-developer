@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ডেভেলপার প্যানেল - এস,এইচ ক্যাবল</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- SweetAlert2 for Premium Popups -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary: #0284c7; --primary-light: #e0f2fe; --success: #10b981;
+            --warning: #f59e0b; --danger: #ef4444; --bg: #f8fafc;
+            --card: #ffffff; --text-main: #0f172a; --text-muted: #64748b;
+            --border: #cbd5e1; --notice-bg: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; margin: 0; padding: 0; }
+        html, body { background: var(--bg); color: var(--text-main); font-size: 15px; overflow-x: hidden; width: 100%; }
+
+        /* Login */
+        #login-section { height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .login-box { background: var(--card); padding: 35px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center; border: 1px solid var(--border); }
+        .login-box h2 { color: var(--primary); margin-bottom: 5px; font-weight: 900; font-size: 24px; }
+        .input-field { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; outline: none; background: #f8fafc; font-weight: 600; color: var(--text-main); transition: 0.3s; }
+        .input-field:focus { border-color: var(--primary); background: #ffffff; box-shadow: 0 0 0 3px var(--primary-light); }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; color: white; background: var(--primary); transition: 0.3s; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); }
+        .btn:hover { background: #0369a1; transform: translateY(-2px); }
+        
+        /* Dashboard Layout */
+        #dashboard-section { display: none; padding: 15px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 15px 20px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid var(--border); }
+        .header h2 { color: var(--primary); font-weight: 800; font-size: 18px; margin: 0; }
+        .btn-logout { background: var(--danger); padding: 8px 16px; border-radius: 10px; border: none; color: white; cursor: pointer; font-weight: 700; font-size: 14px; transition: 0.3s; }
+        .btn-logout:hover { background: #dc2626; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); padding: 25px 15px; border-radius: 16px; text-align: center; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .stat-card h3 { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+        .stat-card h2 { font-size: 22px; font-weight: 800; color: var(--text-main); margin: 0; }
+
+        /* Action Buttons */
+        .action-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-action-top { flex: 1; padding: 14px 10px; border-radius: 12px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; min-width: 130px; transition: 0.3s; }
+        .btn-action-top:hover { transform: translateY(-2px); }
+        .btn-support { background: var(--warning); color: #000; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2); }
+        .btn-broadcast { background: var(--notice-bg); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2); }
+        .btn-history { background: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); width: 100%; margin-bottom: 15px;}
+
+        /* Card Container */
+        .card { background: var(--card); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border); margin-bottom: 25px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border); padding-bottom: 15px; margin-bottom: 15px; }
+        .card-header h3 { font-size: 18px; color: var(--text-main); font-weight: 800; }
+        .btn-edit { background: #f1f5f9; color: #0f172a; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-edit:hover { background: #e2e8f0; }
+        
+        /* Badges */
+        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .badge-active { background: #d1fae5; color: var(--success); }
+        .badge-expired { background: #fee2e2; color: var(--danger); }
+        .badge-locked { background: #1e293b; color: #ffffff; }
+
+        /* Detail Rows */
+        .detail-row { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border); padding: 12px 0; font-size: 14px; align-items: center; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: var(--text-muted); font-weight: 600; }
+        .detail-value { color: var(--text-main); font-weight: 800; font-size: 15px;}
+
+        /* Payment Review Box */
+        .review-box { background: #fefce8; border: 2px solid #facc15; border-radius: 14px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 10px rgba(250, 204, 21, 0.1); }
+        .review-box h4 { color: #a16207; font-size: 16px; margin-bottom: 12px; font-weight: 800;}
+
+        /* Package Selector */
+        .package-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0 20px 0; }
+        .package-card { border: 2px solid var(--border); border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; }
+        .package-card.selected { border-color: var(--primary); background: var(--primary-light); transform: scale(1.02); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.15);}
+        .package-card h4 { font-size: 15px; color: var(--text-main); margin-bottom: 2px; font-weight: 800;}
+
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .btn-ctrl { flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; color: white; min-width: 120px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-ctrl:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* General Delete Button Style for Items */
+        .btn-delete-item {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-delete-item:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* History Items */
+        .history-item { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 12px; text-align: left; transition: 0.2s; position: relative;}
+        .history-item:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .history-item.approved { border-left: 5px solid var(--success); }
+        .history-item.rejected { border-left: 5px solid var(--danger); }
+        .history-item.edited { border-left: 5px solid var(--warning); }
+        
+        .h-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: flex-start; }
+        .h-method { font-weight: 800; color: var(--primary); font-size: 15px; display: block; margin-bottom: 5px;}
+        .h-amount { font-weight: 800; font-size: 12px; padding: 3px 8px; background: #fff; border-radius: 6px; border: 1px solid var(--border); display: inline-block;}
+        .h-trx { font-size: 14px; color: var(--text-muted); font-weight: bold; margin-top: 5px;}
+        .h-date { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 5px; }
+
+        /* Message Bubble */
+        .msg-bubble { background: #f1f5f9; border-radius: 14px; padding: 15px; margin-bottom: 12px; text-align: left; border: 1px solid var(--border); position: relative;}
+        .msg-bubble.dev { background: #e0f2fe; border-color: #bae6fd; }
+        .msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 15px; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--card); padding: 25px; border-radius: 20px; width: 100%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; max-height: 90vh; overflow-y: auto; text-align: center; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: #f1f5f9; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 18px; cursor: pointer; color: var(--danger); font-weight: bold; transition: 0.2s;}
+        .modal-close:hover { background: #fee2e2; }
+        .modal-box h3 { color: var(--primary); margin-bottom: 20px; font-size: 20px; font-weight: 800; }
+        .form-label { display: block; font-size: 14px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; text-align: left; }
+        
+        .footer { text-align: center; margin-top: 10px; padding-bottom: 20px; color: var(--text-muted); font-size: 13px; font-weight: 600; }
+        .swal2-title, .swal2-html-container { font-family: 'Hind Siliguri', sans-serif !important; }
+    </style>
+</head>
+<body>
+
+    <!-- 🛡️ লগইন স্ক্রিন -->
+    <div id="login-section">
+        <div class="login-box">
+            <h2>💻 ডেভেলপার প্যানেল</h2>
+            <p style="color:gray; font-size:14px; font-weight:bold; margin-bottom:25px;">এস,এইচ ক্যাবল নেটওয়ার্ক</p>
+            <input type="email" id="adminEmail" class="input-field" value="ourshop650@gmail.com">
+            <input type="password" id="adminPassword" class="input-field" value="AmiRajon44">
+            <button class="btn" id="loginBtn" onclick="window.loginAdmin()">লগইন করুন</button>
+        </div>
+    </div>
+
+    <!-- 📊 ড্যাশবোর্ড -->
+    <div id="dashboard-section">
+        <div class="header">
+            <h2>⚙️ কন্ট্রোল প্যানেল</h2>
+            <button class="btn-logout" onclick="window.logoutAdmin()">লগআউট</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>অ্যাডমিন অ্যাপের অবস্থা</h3>
+                <h2 id="statStatus" style="color: var(--primary);">লোড হচ্ছে...</h2>
+            </div>
+            <div class="stat-card stat-income">
+                <h3>সর্বমোট পেমেন্ট এসেছে</h3>
+                <h2 id="statIncome">০ বার</h2>
+            </div>
+        </div>
+
+        <!-- অ্যাকশন বাটন গ্রুপ -->
+        <button class="btn-action-top btn-history" onclick="window.openHistoryModal()">
+            <span>📜 পেমেন্ট হিস্ট্রি (লগ)</span>
+        </button>
+        <div class="action-bar">
+            <button class="btn-action-top btn-support" onclick="window.openSupportModal()">
+                <span>📩 অ্যাডমিনের মেসেজ (<span id="supportCount">০</span>)</span>
+            </button>
+            <button class="btn-action-top btn-broadcast" onclick="window.openBroadcastModal()">
+                <span>📢 কাস্টমার অ্যাপে বিজ্ঞাপন</span>
+            </button>
+        </div>
+
+        <!-- প্রধান সাবস্ক্রিপশন কার্ড -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3>সাবস্ক্রিপশন নিয়ন্ত্রণ</h3>
+                    <div id="statusBadgeWrap" style="margin-top: 5px;"></div>
+                </div>
+                <button class="btn-edit" onclick="window.openEditModal()">✏️ এডিট করুন</button>
+            </div>
+
+            <div id="shopContent">
+                <div class="detail-row">
+                    <span class="detail-label">বর্তমান মেয়াদ শেষ:</span>
+                    <span class="detail-value" id="dispExpiry"></span>
+                </div>
+                
+                <!-- 🔔 অ্যাডমিন অ্যাপ থেকে পাঠানো পেমেন্ট রিকোয়েস্ট -->
+                <div id="paymentReviewBox" class="review-box" style="display: none;">
+                    <h4>🔔 নতুন পেমেন্ট রিকোয়েস্ট এসেছে!</h4>
+                    <div class="detail-row"><span class="detail-label">পেমেন্ট মেথড:</span><span class="detail-value" id="revMethod"></span></div>
+                    <div class="detail-row"><span class="detail-label">সেন্ডার নম্বর:</span><span class="detail-value" id="revNumber"></span></div>
+                    <div class="detail-row"><span class="detail-label">রিকোয়েস্ট মাস:</span><span class="detail-value" id="revMonths" style="color: var(--success);"></span></div>
+                    <div class="detail-row"><span class="detail-label">TrxID:</span><span class="detail-value" id="revTrx" style="color: var(--danger);"></span></div>
+                </div>
+
+                <!-- প্যাকেজ সিলেক্ট -->
+                <div style="margin-top: 20px;">
+                    <label style="display:block; font-size: 14px; color: var(--primary); font-weight: 800; margin-bottom: 10px;">কত মাসের মেয়াদ বাড়াবেন?</label>
+                    <div class="package-grid">
+                        <div class="package-card selected" onclick="window.selectPackage(1, this)"><h4>১ মাস</h4></div>
+                        <div class="package-card" onclick="window.selectPackage(3, this)"><h4>৩ মাস</h4></div>
+                        <div class="package-card" onclick="window.selectPackage(6, this)"><h4>৬ মাস</h4></div>
+                    </div>
+                    <input type="hidden" id="selectedMonths" value="1">
+                </div>
+
+                <!-- পেন্ডিং পেমেন্ট থাকলে এই বাটনগুলো দেখাবে -->
+                <div class="btn-group" id="btnGroupPending" style="display: none;">
+                    <button class="btn-ctrl" onclick="window.executeApprovePayment()" style="background: var(--success);">✅ অ্যাপ্রুভ করুন</button>
+                    <button class="btn-ctrl" onclick="window.executeRejectPayment()" style="background: var(--danger);">❌ রিজেক্ট করুন</button>
+                </div>
+
+                <!-- পেন্ডিং পেমেন্ট না থাকলে এই বাটনগুলো দেখাবে -->
+                <div class="btn-group" id="btnGroupManual">
+                    <button class="btn-ctrl" onclick="window.executeApprovePayment()" style="background: var(--primary);">➕ ম্যানুয়াল মেয়াদ বাড়ান</button>
+                    <button class="btn-ctrl" id="lockBtn" onclick="window.toggleShopLock()" style="background: #334155;">🔒 লক করুন</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">Developed by: মোঃ রাজন হোসাইন</div>
+    </div>
+
+    <!-- ✏️ ম্যানুয়াল এডিট মোডাল -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close" onclick="document.getElementById('editModal').style.display='none'">✖</button>
+            <h3 style="margin-bottom: 25px;">✏️ ম্যানুয়ালি তারিখ এডিট</h3>
+            
+            <label class="form-label">মেয়াদ শেষের তারিখ ও সময় দিন:</label>
+            <input type="datetime-local" id="editExpiryDate" class="input-field">
+            
+            <label class="form-label">অ্যাপের বর্তমান স্ট্যাটাস:</label>
+            <select id="editStatus" class="input-field" style="cursor: pointer;">
+                <option value="active">অ্যাক্টিভ (চালু থাকবে)</option>
+                <option value="inactive">লকড (বন্ধ থাকবে)</option>
+            </select>
+            
+            <button class="btn" onclick="window.saveEditedData()" style="background: var(--success); margin-top: 15px;">💾 সেভ করুন</button>
+        </div>
+    </div>
+
+    <!-- 📜 পেমেন্ট হিস্ট্রি মোডাল -->
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 500px;">
+            <button class="modal-close" onclick="document.getElementById('historyModal').style.display='none'">✖</button>
+            <h3 style="margin-bottom: 20px;">📜 পেমেন্ট লগ (হিস্ট্রি)</h3>
+            <div id="historyListContainer" style="max-height: 400px; overflow-y: auto; padding-right:5px; padding-top: 5px;"></div>
+        </div>
+    </div>
+
+    <!-- 🛠️ অ্যাডমিন মেসেজ মোডাল -->
+    <div id="supportModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 500px;">
+            <button class="modal-close" onclick="document.getElementById('supportModal').style.display='none'">✖</button>
+            <h3 style="margin-bottom: 20px;">📩 ইনবক্স</h3>
+            <div id="supportListContainer" style="max-height: 350px; overflow-y: auto; margin-bottom:15px; padding-right:5px; padding-top: 5px;"></div>
+            
+            <!-- Reply Box -->
+            <div style="border-top: 1px dashed var(--border); padding-top: 15px;">
+                <textarea id="devReplyMsg" class="input-field" style="height: 70px; resize: none; margin-bottom:10px;" placeholder="অ্যাডমিনকে মেসেজ বা রিপ্লাই দিন..."></textarea>
+                <button class="btn" style="background: var(--success);" onclick="window.sendDevReply()">মেসেজ পাঠান</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📢 বিজ্ঞাপন মোডাল -->
+    <div id="broadcastModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close" onclick="document.getElementById('broadcastModal').style.display='none'">✖</button>
+            <h3 style="margin-bottom: 15px;">📢 কাস্টমার অ্যাপে বিজ্ঞাপন</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; font-weight:bold;">এই লেখাটি সরাসরি গ্রাহক অ্যাপের একদম নিচের স্লাইডারে শো করবে।</p>
+            
+            <textarea id="broadcastMsg" class="input-field" style="height: 120px; resize: none; margin-bottom:15px;">🚀 App & Website Development | মোঃ রাজন হোসাইন | যেকোনো অ্যাপ তৈরি করতে যোগাযোগ করুন | 📞 01612925872</textarea>
+            
+            <button class="btn" style="background: var(--notice-bg);" onclick="window.updateDeveloperAd()">আপডেট করুন</button>
+        </div>
+    </div>
+
+    <!-- 🔥 Firebase v10 Modular SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, update, remove, push } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVayEOdVQHbr7KPR3YGG5Q74XnndK7aYY",
+            authDomain: "ss-network-a1287.firebaseapp.com",
+            databaseURL: "https://ss-network-a1287-default-rtdb.firebaseio.com",
+            projectId: "ss-network-a1287",
+            storageBucket: "ss-network-a1287.firebasestorage.app",
+            messagingSenderId: "1025070860423",
+            appId: "1:1025070860423:web:2e964b09d29f2362cc5022"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentSubscription = {};
+        let pendingPayments = [];
+        let devMessages = [];
+        let paymentHistoryData = [];
+
+        const toBengaliNum = (num) => {
+            if(num === undefined || num === null) return '০';
+            const engToBan = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
+            return num.toString().split('').map(char => engToBan[char] || char).join('');
+        };
+
+        window.loginAdmin = async () => {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const btn = document.getElementById('loginBtn');
+
+            if(!email || !password) return Swal.fire('সতর্কতা', 'ইমেইল এবং পাসওয়ার্ড দিন!', 'warning');
+
+            btn.innerText = "লগইন হচ্ছে...";
+            Swal.fire({ title: 'লগইন হচ্ছে...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                Swal.close();
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'block';
+                
+                window.listenToSubscription();
+                window.listenToAdminPayments();
+                window.listenToMessages();
+                window.listenToPaymentHistory();
+            } catch (error) {
+                Swal.fire('লগইন ফেইল', 'ইমেইল বা পাসওয়ার্ড ভুল আছে!', 'error');
+                btn.innerText = "লগইন করুন";
+            }
+        };
+
+        window.logoutAdmin = async () => {
+            await signOut(auth);
+            document.getElementById('login-section').style.display = 'flex';
+            document.getElementById('dashboard-section').style.display = 'none';
+        };
+
+        window.selectPackage = (months, element) => {
+            document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('selectedMonths').value = months;
+        };
+
+        // ========================================================
+        // ১. সাবস্ক্রিপশন লিসেনার (এস,এইচ ক্যাবল ডাটাবেজ)
+        // ========================================================
+        window.listenToSubscription = () => {
+            onValue(ref(db, 'admin_subscription'), (snapshot) => {
+                currentSubscription = snapshot.exists() ? snapshot.val() : {};
+                
+                const expiresAt = currentSubscription.expiresAt || 0;
+                const isExpired = expiresAt < Date.now();
+                
+                if (!expiresAt) {
+                    document.getElementById('dispExpiry').innerHTML = `<span style="color:gray;">এখনো নির্ধারণ করা হয়নি</span>`;
+                } else {
+                    const d = new Date(expiresAt);
+                    const formattedDate = d.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('dispExpiry').innerHTML = isExpired ? 
+                        `<span style="color:var(--danger);">${formattedDate} <br><small>(মেয়াদ শেষ)</small></span>` : 
+                        `<span style="color:var(--success); font-weight:900;">${formattedDate}</span>`;
+                }
+
+                const lockBtn = document.getElementById('lockBtn');
+                const badgeWrap = document.getElementById('statusBadgeWrap');
+
+                if (currentSubscription.status === 'inactive') {
+                    document.getElementById('statStatus').innerText = "লকড";
+                    badgeWrap.innerHTML = `<span class="badge badge-locked">🔒 স্থগিত / লক</span>`;
+                    lockBtn.innerHTML = `🔓 আনলক করুন`;
+                    lockBtn.style.background = 'var(--success)';
+                } else if (isExpired) {
+                    document.getElementById('statStatus').innerText = "মেয়াদ শেষ";
+                    badgeWrap.innerHTML = `<span class="badge badge-expired">❌ মেয়াদ শেষ (লক)</span>`;
+                    lockBtn.innerHTML = `🔓 আনলক করুন`;
+                    lockBtn.style.background = 'var(--success)';
+                } else {
+                    document.getElementById('statStatus').innerText = "অ্যাক্টিভ";
+                    badgeWrap.innerHTML = `<span class="badge badge-active">✅ অ্যাক্টিভ</span>`;
+                    lockBtn.innerHTML = `🔒 লক করুন`;
+                    lockBtn.style.background = '#334155';
+                }
+            });
+        };
+
+        // ========================================================
+        // ২. পেমেন্ট রিকোয়েস্ট (dev_payments)
+        // ========================================================
+        window.listenToAdminPayments = () => {
+            onValue(ref(db, 'dev_payments'), (snapshot) => {
+                pendingPayments = [];
+                const reviewBox = document.getElementById('paymentReviewBox');
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const val = child.val();
+                        if (!val.status || val.status === 'pending') {
+                            pendingPayments.push({ id: child.key, ...val });
+                        }
+                    });
+                }
+
+                if (pendingPayments.length > 0) {
+                    const latest = pendingPayments[pendingPayments.length - 1];
+                    reviewBox.style.display = 'block';
+                    document.getElementById('btnGroupPending').style.display = 'flex';
+                    document.getElementById('btnGroupManual').style.display = 'none';
+
+                    document.getElementById('revMethod').innerText = latest.method || 'বিকাশ/নগদ';
+                    document.getElementById('revNumber').innerText = latest.sender || 'দেওয়া হয়নি';
+                    document.getElementById('revMonths').innerText = (latest.months || '১') + ' মাস';
+                    document.getElementById('revTrx').innerText = latest.trxId || 'নেই';
+
+                    let reqMonths = parseInt(latest.months) || 1;
+                    let cards = document.querySelectorAll('.package-card');
+                    if (reqMonths === 3) window.selectPackage(3, cards[1]);
+                    else if (reqMonths === 6) window.selectPackage(6, cards[2]);
+                    else window.selectPackage(1, cards[0]);
+
+                } else {
+                    reviewBox.style.display = 'none';
+                    document.getElementById('btnGroupPending').style.display = 'none';
+                    document.getElementById('btnGroupManual').style.display = 'flex';
+                }
+            });
+        };
+
+        // ========================================================
+        // ৩. পেমেন্ট হিস্ট্রি (dev_payment_history) ও ডিলেট 
+        // ========================================================
+        window.listenToPaymentHistory = () => {
+            onValue(ref(db, 'dev_payment_history'), (snapshot) => {
+                paymentHistoryData = [];
+                if(snapshot.exists()) {
+                    snapshot.forEach(child => { paymentHistoryData.push({id: child.key, ...child.val()}); });
+                }
+                document.getElementById('statIncome').innerText = toBengaliNum(paymentHistoryData.length) + " বার";
+                
+                // Modal open থাকলে সাথে সাথে রিফ্রেশ হবে
+                if(document.getElementById('historyModal').style.display === 'flex') {
+                    window.openHistoryModal();
+                }
+            });
+        };
+
+        window.openHistoryModal = () => {
+            const container = document.getElementById('historyListContainer');
+            container.innerHTML = '';
+
+            if (paymentHistoryData.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 30px; color:gray; font-weight:bold;">কোনো পেমেন্ট হিস্ট্রি নেই।</div>`;
+            } else {
+                paymentHistoryData.slice().reverse().forEach(item => {
+                    let cssClass = 'edited'; let statusText = '✏ এডিটেড';
+                    if(item.status === 'approved' || item.status === 'approved_manual') { cssClass = 'approved'; statusText = '✅ অ্যাপ্রুভড'; }
+                    else if(item.status === 'rejected') { cssClass = 'rejected'; statusText = '❌ রিজেক্টেড'; }
+                    
+                    const method = item.method || 'ম্যানুয়াল আপডেট';
+                    const months = item.months || 0;
+                    const trx = item.trxId || '---';
+                    const date = item.date || new Date().toLocaleDateString('bn-BD');
+
+                    const div = document.createElement('div');
+                    div.className = `history-item ${cssClass}`;
+                    div.innerHTML = `
+                        <div class="h-top">
+                            <div>
+                                <span class="h-method">${method} ${months > 0 ? `(${toBengaliNum(months)} মাস)` : ''}</span>
+                                <span class="h-amount" style="color: ${cssClass === 'approved' ? 'var(--success)' : (cssClass === 'rejected' ? 'var(--danger)' : 'var(--warning)')};">${statusText}</span>
+                            </div>
+                            <button class="btn-delete-item" onclick="window.deleteHistoryItem('${item.id}')" title="হিস্ট্রি মুছুন"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                        <div class="h-trx">TrxID: ${trx}</div>
+                        <div class="h-date"><i class="far fa-clock"></i> ${date}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            document.getElementById('historyModal').style.display = 'flex';
+        };
+
+        window.deleteHistoryItem = (id) => {
+            Swal.fire({
+                title: 'নিশ্চিত?', text: "এই রেকর্ডটি ডাটাবেজ থেকে চিরতরে মুছে যাবে!", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'হ্যাঁ, মুছুন', cancelButtonText: 'বাতিল'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await remove(ref(db, 'dev_payment_history/' + id));
+                        Swal.fire('সফল', 'রেকর্ডটি মুছে ফেলা হয়েছে।', 'success');
+                    } catch(e) { Swal.fire('ত্রুটি', e.message, 'error'); }
+                }
+            });
+        };
+
+        // ========================================================
+        // ৪. পেমেন্ট অ্যাপ্রুভ / ম্যানুয়াল মেয়াদ বাড়ানো
+        // ========================================================
+        window.executeApprovePayment = async () => {
+            const months = parseInt(document.getElementById('selectedMonths').value) || 1;
+            
+            Swal.fire({
+                title: 'নিশ্চিত করুন', text: `আপনি কি মেয়াদ ${toBengaliNum(months)} মাস বাড়াতে চান?`, icon: 'question',
+                showCancelButton: true, confirmButtonColor: '#10b981', cancelButtonColor: '#64748b', confirmButtonText: 'হ্যাঁ, বাড়ান', cancelButtonText: 'বাতিল'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        let currentExpiry = currentSubscription.expiresAt || Date.now();
+                        if (currentExpiry < Date.now()) currentExpiry = Date.now();
+                        
+                        let newExpiry = currentExpiry + (months * 30 * 24 * 60 * 60 * 1000); 
+                        
+                        const promises = [];
+                        promises.push(update(ref(db, 'admin_subscription'), { expiresAt: newExpiry, status: 'active' }));
+
+                        if (pendingPayments.length > 0) {
+                            for (const p of pendingPayments) {
+                                const histRef = push(ref(db, 'dev_payment_history'));
+                                promises.push(set(histRef, { ...p, status: 'approved', actionAt: Date.now() }));
+                                promises.push(remove(ref(db, 'dev_payments/' + p.id)));
+                            }
+                        } else {
+                            const histRef = push(ref(db, 'dev_payment_history'));
+                            promises.push(set(histRef, { method: 'ম্যানুয়াল আপডেট', months: months, status: 'approved_manual', date: new Date().toLocaleDateString('bn-BD') }));
+                        }
+
+                        Swal.fire({ title: 'আপডেট হচ্ছে...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                        await Promise.all(promises);
+                        Swal.fire('সফল', `পেমেন্ট সফল! মেয়াদ ${toBengaliNum(months)} মাস বাড়ানো হয়েছে।`, 'success');
+                    } catch (error) { Swal.fire('ত্রুটি', error.message, 'error'); }
+                }
+            });
+        };
+
+        window.executeRejectPayment = async () => {
+            Swal.fire({
+                title: 'নিশ্চিত?', text: "আপনি কি পেমেন্টটি বাতিল (Reject) করবেন?", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'হ্যাঁ, বাতিল করুন', cancelButtonText: 'না'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        Swal.fire({ title: 'বাতিল করা হচ্ছে...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                        const promises = [];
+                        for (const p of pendingPayments) {
+                            const histRef = push(ref(db, 'dev_payment_history'));
+                            promises.push(set(histRef, { ...p, status: 'rejected', actionAt: Date.now() }));
+                            promises.push(remove(ref(db, 'dev_payments/' + p.id)));
+                        }
+                        await Promise.all(promises);
+                        Swal.fire('বাতিল', 'পেমেন্ট রিকোয়েস্ট বাতিল করা হয়েছে।', 'success');
+                    } catch (error) { Swal.fire('ত্রুটি', error.message, 'error'); }
+                }
+            });
+        };
+
+        // ========================================================
+        // ৬. এডিট সাবস্ক্রিপশন (তারিখ অনুযায়ী অটো অ্যাক্টিভ)
+        // ========================================================
+        window.openEditModal = () => {
+            let isoStr = "";
+            if (currentSubscription.expiresAt) {
+                const d = new Date(currentSubscription.expiresAt);
+                const tzoffset = d.getTimezoneOffset() * 60000; 
+                isoStr = (new Date(d - tzoffset)).toISOString().slice(0, 16);
+            }
+            document.getElementById('editExpiryDate').value = isoStr;
+            document.getElementById('editStatus').value = currentSubscription.status || 'active';
+            document.getElementById('editModal').style.display = 'flex';
+        };
+
+        window.saveEditedData = async () => {
+            const expDateRaw = document.getElementById('editExpiryDate').value;
+            const status = document.getElementById('editStatus').value;
+            let finalTimestamp = expDateRaw ? new Date(expDateRaw).getTime() : 0;
+
+            if(!finalTimestamp) return Swal.fire('সতর্কতা', 'দয়া করে একটি সঠিক তারিখ ও সময় দিন।', 'warning');
+
+            try {
+                Swal.fire({ title: 'সেভ হচ্ছে...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                
+                await update(ref(db, 'admin_subscription'), { expiresAt: finalTimestamp, status: status });
+                const histRef = push(ref(db, 'dev_payment_history'));
+                await set(histRef, { method: 'তারিখ এডিট', months: 0, status: 'edited', date: new Date().toLocaleDateString('bn-BD') });
+
+                document.getElementById('editModal').style.display = 'none';
+                Swal.fire('সফল', 'তারিখ ও স্ট্যাটাস সফলভাবে আপডেট হয়েছে!', 'success');
+            } catch(e) { Swal.fire('ত্রুটি', e.message, 'error'); }
+        };
+
+        // ========================================================
+        // ৭. অ্যাডমিন অ্যাপ লক / আনলক (রিয়ে-টাইম)
+        // ========================================================
+        window.toggleShopLock = async () => {
+            const isCurrentlyLocked = (currentSubscription.status === 'inactive' || (currentSubscription.expiresAt && currentSubscription.expiresAt < Date.now()));
+            const isExpired = (currentSubscription.expiresAt && currentSubscription.expiresAt < Date.now());
+
+            if (isCurrentlyLocked) {
+                if(isExpired) {
+                    return Swal.fire('সতর্কতা', 'অ্যাডমিন অ্যাপের মেয়াদ শেষ হয়ে গেছে! আনলক করতে হলে আগে উপরে থেকে ম্যানুয়ালি মেয়াদ বাড়ান।', 'warning');
+                }
+                Swal.fire({
+                    title: 'আনলক করবেন?', text: "অ্যাডমিন অ্যাপটি সাথে সাথে চালু হয়ে যাবে।", icon: 'question',
+                    showCancelButton: true, confirmButtonColor: '#10b981', cancelButtonColor: '#64748b', confirmButtonText: 'হ্যাঁ, আনলক করুন', cancelButtonText: 'বাতিল'
+                }).then(async (res) => {
+                    if(res.isConfirmed) {
+                        await update(ref(db, 'admin_subscription'), { status: 'active' });
+                        Swal.fire('সফল', 'অ্যাপটি আনলক করা হয়েছে!', 'success');
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'লক করবেন?', text: "অ্যাডমিন অ্যাপটি সাথে সাথে বন্ধ হয়ে যাবে।", icon: 'warning',
+                    showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'হ্যাঁ, লক করুন', cancelButtonText: 'বাতিল'
+                }).then(async (res) => {
+                    if(res.isConfirmed) {
+                        await update(ref(db, 'admin_subscription'), { status: 'inactive' });
+                        Swal.fire('সফল', 'অ্যাপটি লক করা হয়েছে!', 'success');
+                    }
+                });
+            }
+        };
+
+        // ========================================================
+        // ৮. ইনবক্স (dev_messages) ও ডিলেট সিস্টেম 
+        // ========================================================
+        window.listenToMessages = () => {
+            onValue(ref(db, 'dev_messages'), (snapshot) => {
+                devMessages = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => { devMessages.push({ id: child.key, ...child.val() }); });
+                }
+                
+                let adminMsgCount = devMessages.filter(m => m.sender === 'WiFi_Admin').length;
+                document.getElementById('supportCount').innerText = toBengaliNum(adminMsgCount);
+                
+                // Modal open থাকলে সাথে সাথে রিফ্রেশ হবে
+                if (document.getElementById('supportModal').style.display === 'flex') {
+                    window.openSupportModal();
+                }
+            });
+        };
+
+        window.openSupportModal = () => {
+            const container = document.getElementById('supportListContainer');
+            container.innerHTML = '';
+            if (devMessages.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 30px; color:gray; font-weight:bold;">কোনো মেসেজ নেই।</div>`;
+            } else {
+                devMessages.slice().reverse().forEach(msg => {
+                    const isDev = (msg.sender === 'Developer');
+                    const div = document.createElement('div');
+                    div.className = `msg-bubble ${isDev ? 'dev' : ''}`;
+                    div.innerHTML = `
+                        <div class="msg-header">
+                            <div>
+                                <span style="color:${isDev ? 'var(--primary)' : 'var(--danger)'};">${isDev ? 'আপনি (ডেভেলপার)' : 'অ্যাডমিন'}</span>
+                                <br>
+                                <span style="color:var(--text-muted); font-weight:normal; font-size:11px;"><i class="far fa-clock"></i> ${msg.date || ''}</span>
+                            </div>
+                            <button class="btn-delete-item" onclick="window.deleteDevMessage('${msg.id}')" title="মেসেজ মুছুন"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                        <div style="font-weight:700; color:var(--text-main); font-size:14px; margin-top:5px;">${msg.message}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            document.getElementById('supportModal').style.display = 'flex';
+        };
+
+        window.deleteDevMessage = (id) => {
+            Swal.fire({
+                title: 'নিশ্চিত?', text: "এই মেসেজটি ডাটাবেজ থেকে চিরতরে মুছে যাবে!", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'হ্যাঁ, মুছুন', cancelButtonText: 'বাতিল'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await remove(ref(db, 'dev_messages/' + id));
+                        Swal.fire('সফল', 'মেসেজটি মুছে ফেলা হয়েছে।', 'success');
+                    } catch(e) { Swal.fire('ত্রুটি', e.message, 'error'); }
+                }
+            });
+        };
+
+        window.sendDevReply = async () => {
+            const text = document.getElementById('devReplyMsg').value.trim();
+            if(!text) return Swal.fire('সতর্কতা', 'মেসেজ লিখুন!', 'warning');
+            try {
+                await push(ref(db, 'dev_messages'), { message: text, date: new Date().toLocaleString('bn-BD'), sender: 'Developer' });
+                document.getElementById('devReplyMsg').value = '';
+            } catch (e) { Swal.fire('ত্রুটি', e.message, 'error'); }
+        };
+
+        // ========================================================
+        // ৯. কাস্টমার অ্যাপে বিজ্ঞাপন (settings/developer_marquee)
+        // ========================================================
+        window.openBroadcastModal = () => {
+            onValue(ref(db, 'settings/developer_marquee'), snap => {
+                if(snap.exists()) document.getElementById('broadcastMsg').value = snap.val();
+            }, {onlyOnce: true});
+            document.getElementById('broadcastModal').style.display = 'flex'; 
+        };
+
+        window.updateDeveloperAd = async () => {
+            const adText = document.getElementById('broadcastMsg').value.trim();
+            if(!adText) return Swal.fire('সতর্কতা', 'ফাঁকা বিজ্ঞাপন দেওয়া যাবে না!', 'warning');
+            
+            Swal.fire({
+                title: 'আপডেট করবেন?', text: "এই লেখাটি সরাসরি গ্রাহক অ্যাপে শো করবে।", icon: 'question',
+                showCancelButton: true, confirmButtonColor: '#8b5cf6', confirmButtonText: 'হ্যাঁ, আপডেট করুন', cancelButtonText: 'বাতিল'
+            }).then(async (result) => {
+                if(result.isConfirmed){
+                    try {
+                        Swal.fire({ title: 'আপডেট হচ্ছে...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                        await set(ref(db, 'settings/developer_marquee'), adText);
+                        document.getElementById('broadcastModal').style.display = 'none';
+                        Swal.fire('সফল', 'বিজ্ঞাপন সফলভাবে আপডেট করা হয়েছে!', 'success');
+                    } catch (error) { Swal.fire('ত্রুটি', error.message, 'error'); }
+                }
+            });
+        };
+    </script>
+</body>
+</html>
